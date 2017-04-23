@@ -264,6 +264,8 @@ if __name__ == "__main__":
     # that the .apply_move() method changes the calling object in-place.
     game.apply_move((2, 3))
     game.apply_move((0, 5))
+    active_player = game.active_player
+    print('legal moves', game.get_legal_moves(active_player))
     print(game.to_string())
 
     # players take turns moving on the board, so player1 should be next to move

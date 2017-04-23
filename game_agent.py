@@ -214,7 +214,9 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
+        # TODO: finish this function
+        player = game.active_player
+        return game.get_legal_moves(player)
         raise NotImplementedError
 
 
