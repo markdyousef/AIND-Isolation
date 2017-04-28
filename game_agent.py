@@ -75,8 +75,8 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    return custom_score(game, player)
+    # raise NotImplementedError
 
 
 def custom_score_3(game, player):
@@ -102,7 +102,8 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    return custom_score(game, player)
+    # raise NotImplementedError
 
 
 class IsolationPlayer:
@@ -232,6 +233,9 @@ class MinimaxPlayer(IsolationPlayer):
 
         # max-value
         def max_value(state, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout
+
             moves = state.get_legal_moves(player)
             # if terminal state is reached - return utility
             if (not moves or depth == 0):
@@ -245,6 +249,8 @@ class MinimaxPlayer(IsolationPlayer):
             return v
 
         def min_value(state, depth):
+            if self.time_left() < self.TIMER_THRESHOLD:
+                raise SearchTimeout
             moves = state.get_legal_moves(player)
             # if terminal state is reached - return utility
             if (not moves or depth == 0):
@@ -259,10 +265,10 @@ class MinimaxPlayer(IsolationPlayer):
         best_move = (-1, -1)
         moves = game.get_legal_moves()
 
-        if (moves):
-            best_move = max(
-                moves,
-                key=lambda move: min_value(game.forecast_move(move), depth)
+        # if (moves):
+        best_move = max(
+            moves,
+            key=lambda move: min_value(game.forecast_move(move), depth)
             )
         return best_move
 
