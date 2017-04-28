@@ -4,6 +4,8 @@ and include the results in your report.
 """
 import random
 
+infinity = float('inf')
+
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
@@ -214,10 +216,37 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function
-        player = game.active_player
-        return game.get_legal_moves(player)
-        raise NotImplementedError
+        # max-value
+        def max_value(state):
+            moves = state.get_legal_moves()
+            print(moves)
+            # if terminal state is reached - return utility
+            if (not moves):
+                return game.utility(self)
+
+            # else return the max value for next moves
+            v = -infinity
+            for move in moves:
+                v = max(v, min_value(game.forecast_move(move)))
+
+            return v
+
+        def min_value(state):
+            moves = state.get_legal_moves(self)
+            print(moves)
+            # if terminal state is reached - return utility
+            if (not moves):
+                return game.utility(self)
+            # # else return the min value for next moves
+            v = infinity
+            for move in moves:
+                v = min(v, max_value(game.forecast_move(move)))
+
+            return v
+
+        state = game.get_legal_moves()
+        print(state)
+        return max(state, key=lambda move: min_value(game.forecast_move(move)))
 
 
 class AlphaBetaPlayer(IsolationPlayer):
