@@ -3,6 +3,7 @@ test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
 import random
+import math
 
 infinity = float('inf')
 
@@ -37,6 +38,16 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves)
+    # return game.utility(player)
     raise NotImplementedError
 
 
@@ -166,6 +177,7 @@ class MinimaxPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
+            print(self.minimax(game, self.search_depth))
             return self.minimax(game, self.search_depth)
 
         except SearchTimeout:
@@ -216,37 +228,43 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
+        player = game.active_player
+
         # max-value
-        def max_value(state):
-            moves = state.get_legal_moves()
-            print(moves)
+        def max_value(state, depth):
+            moves = state.get_legal_moves(player)
             # if terminal state is reached - return utility
-            if (not moves):
-                return game.utility(self)
+            if (not moves or depth == 0):
+                return self.score(state, player)
 
             # else return the max value for next moves
             v = -infinity
             for move in moves:
-                v = max(v, min_value(game.forecast_move(move)))
+                v = max(v, min_value(game.forecast_move(move), depth - 1))
 
             return v
 
-        def min_value(state):
-            moves = state.get_legal_moves(self)
-            print(moves)
+        def min_value(state, depth):
+            moves = state.get_legal_moves(player)
             # if terminal state is reached - return utility
-            if (not moves):
-                return game.utility(self)
+            if (not moves or depth == 0):
+                return self.score(state, player)
             # # else return the min value for next moves
             v = infinity
             for move in moves:
-                v = min(v, max_value(game.forecast_move(move)))
+                v = min(v, max_value(game.forecast_move(move), depth - 1))
 
             return v
 
-        state = game.get_legal_moves()
-        print(state)
-        return max(state, key=lambda move: min_value(game.forecast_move(move)))
+        best_move = (-1, -1)
+        moves = game.get_legal_moves()
+
+        if (moves):
+            best_move = max(
+                moves,
+                key=lambda move: min_value(game.forecast_move(move), depth)
+            )
+        return best_move
 
 
 class AlphaBetaPlayer(IsolationPlayer):
