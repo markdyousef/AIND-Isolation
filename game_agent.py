@@ -37,16 +37,6 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    if game.is_loser(player):
-        return float("-inf")
-
-    if game.is_winner(player):
-        return float("inf")
-
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves)
     # return game.utility(player)
     raise NotImplementedError
 
@@ -75,8 +65,8 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    return custom_score(game, player)
-    # raise NotImplementedError
+    # return custom_score(game, player)
+    raise NotImplementedError
 
 
 def custom_score_3(game, player):
@@ -102,8 +92,8 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    return custom_score(game, player)
-    # raise NotImplementedError
+    # return custom_score(game, player)
+    raise NotImplementedError
 
 
 class IsolationPlayer:
@@ -178,7 +168,6 @@ class MinimaxPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            print(self.minimax(game, self.search_depth))
             return self.minimax(game, self.search_depth)
 
         except SearchTimeout:
@@ -236,7 +225,7 @@ class MinimaxPlayer(IsolationPlayer):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout
 
-            moves = state.get_legal_moves(player)
+            moves = state.get_legal_moves()
             # if terminal state is reached - return utility
             if (not moves or depth == 0):
                 return self.score(state, player)
@@ -244,14 +233,14 @@ class MinimaxPlayer(IsolationPlayer):
             # else return the max value for next moves
             v = -infinity
             for move in moves:
-                v = max(v, min_value(game.forecast_move(move), depth - 1))
+                v = max(v, min_value(state.forecast_move(move), depth - 1))
 
             return v
 
         def min_value(state, depth):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout
-            moves = state.get_legal_moves(player)
+            moves = state.get_legal_moves()
             # if terminal state is reached - return utility
             if (not moves or depth == 0):
                 return self.score(state, player)
@@ -263,12 +252,12 @@ class MinimaxPlayer(IsolationPlayer):
             return v
 
         best_move = (-1, -1)
-        moves = game.get_legal_moves()
 
-        # if (moves):
-        best_move = max(
-            moves,
-            key=lambda move: min_value(game.forecast_move(move), depth)
+        moves = game.get_legal_moves()
+        if (moves):
+            best_move = max(
+                moves,
+                key=lambda move: min_value(game.forecast_move(move), depth - 1)
             )
         return best_move
 
