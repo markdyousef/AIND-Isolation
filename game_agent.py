@@ -255,6 +255,7 @@ class MinimaxPlayer(IsolationPlayer):
         def min_value(state, depth):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout
+
             moves = state.get_legal_moves()
             # if terminal state is reached - return utility
             if (not moves or depth == 0):
@@ -316,18 +317,24 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.time_left = time_left
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
-        legal_moves = (-1, -1)
+        legal_move = (-1, -1)
 
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            return self.alphabeta(game, self.search_depth)
+            for depth in range(1, 100):
+                legal_move = self.alphabeta(game, depth)
+                if (time_left() == 0.1):
+                    return legal_move
+
+            # return self.alphabeta(game, self.search_depth)
 
         except SearchTimeout:
+            return legal_move
             pass  # Handle any actions required after timeout as needed
 
         # Return the best move from the last completed search iteration
-        return legal_moves
+        return legal_move
 
         # TODO: finish this function!
         raise NotImplementedError
