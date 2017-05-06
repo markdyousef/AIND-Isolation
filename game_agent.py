@@ -299,6 +299,20 @@ class AlphaBetaPlayer(IsolationPlayer):
             (-1, -1) if there are no available legal moves.
         """
         self.time_left = time_left
+        # Initialize the best move so that this function returns something
+        # in case the search fails due to timeout
+        legal_moves = (-1, -1)
+
+        try:
+            # The try/except block will automatically catch the exception
+            # raised when the timer is about to expire.
+            return self.alphabeta(game, self.search_depth)
+
+        except SearchTimeout:
+            pass  # Handle any actions required after timeout as needed
+
+        # Return the best move from the last completed search iteration
+        return legal_moves
 
         # TODO: finish this function!
         raise NotImplementedError
