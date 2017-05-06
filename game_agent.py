@@ -402,7 +402,8 @@ class AlphaBetaPlayer(IsolationPlayer):
                     beta
                 ))
                 if v >= beta:
-                    alpha = max(alpha, v)
+                    return v
+                alpha = max(alpha, v)
 
             return v
 
@@ -424,15 +425,17 @@ class AlphaBetaPlayer(IsolationPlayer):
                     beta
                 ))
                 if v <= alpha:
-                    beta = min(beta, v)
+                    return v
+                beta = min(beta, v)
 
             return v
 
         best_move = (-1, -1)
         moves = game.get_legal_moves()
         for move in moves:
-            v = max_value(game.forecast_move(move), depth - 1, alpha, beta)
+            v = min_value(game.forecast_move(move), depth - 1, alpha, beta)
             if v > alpha:
+                alpha = v
                 best_move = move
 
         return best_move
