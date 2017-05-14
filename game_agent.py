@@ -43,7 +43,13 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    return float(len(game.get_legal_moves(player)))
+    # return custom_score(game, player)
+    opponent = game.get_opponent(player)
+
+    my_moves = len(game.get_legal_moves(player))
+    opponent_moves = len(game.get_legal_moves(opponent))
+
+    return (1.0 + my_moves) * 10.0 / (opponent_moves + 1.0) * 10.0
     # raise NotImplementedError
 
 
@@ -71,12 +77,17 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
     # return custom_score(game, player)
     opponent = game.get_opponent(player)
     my_moves = len(game.get_legal_moves(player))
     opponent_moves = len(game.get_legal_moves(opponent))
 
-    return my_moves - 2.0 * opponent_moves
+    return 5.0 * my_moves - 10.0 * opponent_moves
 
     # raise NotImplementedError
 
@@ -103,12 +114,18 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
     opponent = game.get_opponent(player)
     my_moves = len(game.get_legal_moves(player))
     opponent_moves = len(game.get_legal_moves(opponent))
 
-    return my_moves - 1.0 * opponent_moves
-    raise NotImplementedError
+    return 10.0 * my_moves - 2.0 * opponent_moves
+    # raise NotImplementedError
 
 
 class IsolationPlayer:
@@ -332,10 +349,11 @@ class AlphaBetaPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            for depth in range(1, 100):
-                legal_move = self.alphabeta(game, depth)
+            # self.search_depth
+            for depth in range(1, 50):
                 if (time_left() == 0.1):
                     return legal_move
+                legal_move = self.alphabeta(game, depth)
 
             # return self.alphabeta(game, self.search_depth)
 
@@ -404,12 +422,14 @@ class AlphaBetaPlayer(IsolationPlayer):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
 
+            v = -infinity
             moves = state.get_legal_moves()
             # if terminal state is reached - return utility
-            if (not moves or depth == 0):
+            if depth == 0:
                 return self.score(state, player)
 
-            v = -infinity
+            if not moves:
+                return v
 
             for move in moves:
                 v = max(v, min_value(
@@ -428,12 +448,15 @@ class AlphaBetaPlayer(IsolationPlayer):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
 
+            v = infinity
             moves = state.get_legal_moves()
             # if terminal state is reached - return utility
-            if (not moves or depth == 0):
+            if depth == 0:
                 return self.score(state, player)
 
-            v = infinity
+            if not moves:
+                return v
+
             for move in moves:
                 v = min(v, max_value(
                     state.forecast_move(move),
